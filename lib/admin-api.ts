@@ -128,8 +128,6 @@ export type AdminDefiAvailable = {
   goalValue: number;
   xpReward: number;
   period: "quotidien" | "hebdomadaire" | "mensuel";
-  startAt: string;
-  endAt: string;
 };
 
 export type DefisResponse = {

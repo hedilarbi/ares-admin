@@ -13,8 +13,7 @@ const KIND_OPTIONS: { value: DefiKind; label: string }[] = [
 const GOAL_TYPE_OPTIONS: { value: DefiGoalType; label: string }[] = [
   { value: "distance", label: "Distance (m)" },
   { value: "nb_courses", label: "Nombre de courses" },
-  { value: "vitesse", label: "Vitesse (m/s)" },
-  { value: "custom", label: "Personnalisé" },
+  { value: "vitesse", label: "Vitesse moyenne sur une course (m/s)" },
 ];
 
 function inputClass() {
@@ -295,36 +294,6 @@ export default function DefiForm({ defi }: { defi?: DefiCatalogEntry }) {
             />
           </div>
 
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase text-[var(--ares-muted-strong)]">
-              Lieux différents
-            </label>
-            <input
-              type="number"
-              min={0}
-              value={conditionConfig.uniqueLocations || ""}
-              onChange={(e) => setConditionConfig({ ...conditionConfig, uniqueLocations: Number(e.target.value) })}
-              placeholder="ex. 10"
-              className={inputClass()}
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase text-[var(--ares-muted-strong)]">
-              Classement
-            </label>
-            <select
-              value={conditionConfig.ranking}
-              onChange={(e) => setConditionConfig({ ...conditionConfig, ranking: e.target.value as any })}
-              className={inputClass()}
-            >
-              <option value="none">Aucun</option>
-              <option value="top_100_city">Top 100 ville</option>
-              <option value="top_10_city">Top 10 ville</option>
-              <option value="top_1_city">Top 1 ville</option>
-              <option value="top_10_country">Top 10 pays</option>
-            </select>
-          </div>
         </div>
       </div>
 

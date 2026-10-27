@@ -18,6 +18,12 @@ const TABS: { key: TabKey; label: string; icon: typeof History }[] = [
   { key: "defis", label: "Défis", icon: Flag },
 ];
 
+const PERIOD_LABELS: Record<AdminDefiAvailable["period"], string> = {
+  quotidien: "Quotidien",
+  hebdomadaire: "Hebdomadaire",
+  mensuel: "Mensuel",
+};
+
 function formatDate(value?: string) {
   if (!value) return "-";
   const date = new Date(value);
@@ -168,7 +174,7 @@ function DefiCard({ defi, joined }: { defi: AdminDefiParticipation | AdminDefiAv
         </>
       ) : (
         <p className="mt-3 text-xs font-semibold text-[var(--ares-muted)]">
-          Se termine le {formatDate((defi as AdminDefiAvailable).endAt)}
+          {PERIOD_LABELS[(defi as AdminDefiAvailable).period]} · {defi.xpReward} XP
         </p>
       )}
     </div>
