@@ -158,6 +158,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
       </section>
 
       <ProfileTabs
+        userId={id}
         runs={runsResult.ok ? runsResult.data.runs : []}
         runsPagination={
           runsResult.ok

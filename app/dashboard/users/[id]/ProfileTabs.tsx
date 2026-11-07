@@ -8,6 +8,7 @@ import type {
   AdminDefiParticipation,
   AdminRun,
   Pagination,
+  RunsHistoryResponse,
 } from "@/lib/admin-api";
 
 type TabKey = "historique" | "badges" | "defis";
@@ -59,7 +60,43 @@ function EmptyState({ label }: { label: string }) {
   );
 }
 
-function RunHistoryTab({ runs, pagination }: { runs: AdminRun[]; pagination: Pagination }) {
+function RunHistoryTab({
+  userId,
+  initialRuns,
+  initialPagination,
+}: {
+  userId: string;
+  initialRuns: AdminRun[];
+  initialPagination: Pagination;
+}) {
+  const [runs, setRuns] = useState(initialRuns);
+  const [pagination, setPagination] = useState(initialPagination);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function loadMore() {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch(
+        `/api/admin/users/${userId}/runs?page=${pagination.page + 1}&limit=${pagination.limit}`,
+        { cache: "no-store" },
+      );
+      const data = (await response.json().catch(() => ({}))) as Partial<RunsHistoryResponse> & { error?: string };
+      if (!response.ok || !data.runs || !data.pagination) {
+        setError(data.error || "Impossible de charger les courses suivantes.");
+        return;
+      }
+      const next = data.runs;
+      setRuns((current) => [...current, ...next.filter((run) => !current.some((c) => c._id === run._id))]);
+      setPagination(data.pagination);
+    } catch {
+      setError("Impossible de contacter le serveur.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (runs.length === 0) {
     return <EmptyState label="Cet utilisateur n'a enregistré aucune course pour le moment." />;
   }
@@ -68,7 +105,7 @@ function RunHistoryTab({ runs, pagination }: { runs: AdminRun[]; pagination: Pag
     <div className="space-y-3">
       <p className="text-xs font-bold uppercase text-[var(--ares-muted)]">
         {pagination.total} course{pagination.total > 1 ? "s" : ""} au total
-        {pagination.totalPages > 1 ? ` · affichage des ${runs.length} plus récentes` : ""}
+        {runs.length < pagination.total ? ` · ${runs.length} affichées` : ""}
       </p>
 
       {runs.map((run) => (
@@ -102,6 +139,19 @@ function RunHistoryTab({ runs, pagination }: { runs: AdminRun[]; pagination: Pag
           </p>
         </div>
       ))}
+
+      {error ? <p className="text-sm font-semibold text-red-400">{error}</p> : null}
+
+      {pagination.hasNextPage ? (
+        <button
+          type="button"
+          onClick={loadMore}
+          disabled={loading}
+          className="w-full rounded-xl border border-[var(--ares-border)] px-4 py-3 text-sm font-bold text-[var(--ares-primary)] transition-colors hover:bg-[var(--ares-bg)] disabled:opacity-50"
+        >
+          {loading ? "Chargement..." : "Voir plus de courses"}
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -245,6 +295,7 @@ function DefisTab({
 }
 
 export default function ProfileTabs({
+  userId,
   runs,
   runsPagination,
   badges,
@@ -252,6 +303,7 @@ export default function ProfileTabs({
   defisDisponibles,
   defisTermines,
 }: {
+  userId: string;
   runs: AdminRun[];
   runsPagination: Pagination;
   badges: AdminBadge[];
@@ -286,7 +338,7 @@ export default function ProfileTabs({
       </div>
 
       <div className="pt-6">
-        {activeTab === "historique" ? <RunHistoryTab runs={runs} pagination={runsPagination} /> : null}
+        {activeTab === "historique" ? <RunHistoryTab userId={userId} initialRuns={runs} initialPagination={runsPagination} /> : null}
         {activeTab === "badges" ? <BadgesTab badges={badges} /> : null}
         {activeTab === "defis" ? (
           <DefisTab enCours={defisEnCours} disponibles={defisDisponibles} termines={defisTermines} />
