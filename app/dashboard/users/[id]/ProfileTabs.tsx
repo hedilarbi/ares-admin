@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Award, Flag, History } from "lucide-react";
+import { Award, Flag, History, Trash2 } from "lucide-react";
 import type {
   AdminBadge,
   AdminDefiAvailable,
@@ -72,7 +72,28 @@ function RunHistoryTab({
   const [runs, setRuns] = useState(initialRuns);
   const [pagination, setPagination] = useState(initialPagination);
   const [loading, setLoading] = useState(false);
+  const [deletingRunId, setDeletingRunId] = useState<string | null>(null);
   const [error, setError] = useState("");
+
+  async function handleInvalidateRun(runId: string) {
+    if (
+      !window.confirm(
+        "Invalider et supprimer cette course ? Ses kilomètres seront retirés des classements personnels et des groupes.",
+      )
+    ) {
+      return;
+    }
+    setDeletingRunId(runId);
+    try {
+      const response = await fetch(`/api/admin/runs/${runId}`, { method: "DELETE" });
+      if (response.ok) {
+        setRuns((prev) => prev.filter((r) => r._id !== runId));
+        setPagination((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }));
+      }
+    } finally {
+      setDeletingRunId(null);
+    }
+  }
 
   async function loadMore() {
     setLoading(true);
@@ -137,6 +158,16 @@ function RunHistoryTab({
           <p className="shrink-0 font-display text-sm font-extrabold text-[var(--ares-primary)]">
             {Math.round(run.caloriesKcal)} kcal
           </p>
+
+          <button
+            type="button"
+            disabled={deletingRunId === run._id}
+            onClick={() => void handleInvalidateRun(run._id)}
+            title="Invalider / supprimer cette course"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--ares-border)] text-[var(--ares-muted)] transition-colors hover:border-red-500/40 hover:text-red-400 disabled:opacity-50"
+          >
+            <Trash2 aria-hidden className="h-4 w-4" />
+          </button>
         </div>
       ))}
 

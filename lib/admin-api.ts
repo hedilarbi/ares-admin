@@ -158,6 +158,98 @@ export type DefiCatalogResponse = {
   defis: DefiCatalogEntry[];
 };
 
+export type AdminGroup = {
+  _id: string;
+  name: string;
+  description?: string;
+  photo?: string;
+  type: "club" | "amis";
+  city: string;
+  governorate: string;
+  country?: string;
+  privacy: "public" | "private";
+  memberCount: number;
+  totalDistanceMetres: number;
+  totalRunsCount: number;
+  creator?: {
+    _id: string;
+    name?: string;
+    pseudo?: string;
+    email?: string;
+  };
+  createdAt: string;
+};
+
+export type AdminGroupsResponse = {
+  groups: AdminGroup[];
+  pendingReportsCount: number;
+  pagination: Pagination;
+};
+
+export type AdminGroupDetailResponse = {
+  group: AdminGroup;
+  members: Array<{
+    _id: string;
+    role: "admin" | "member";
+    status: "active" | "pending_request" | "invited";
+    joinedAt: string;
+    user?: {
+      _id: string;
+      name?: string;
+      pseudo?: string;
+      email?: string;
+      city?: string;
+      level?: string;
+    };
+  }>;
+  challenges: Array<{
+    _id: string;
+    title: string;
+    description?: string;
+    mode: "individuel" | "collectif";
+    goalType: "distance" | "nb_courses";
+    goalValue: number;
+    collectiveProgressValue: number;
+    participantCount: number;
+    startDate: string;
+    endDate: string;
+  }>;
+  posts: Array<{
+    _id: string;
+    caption: string;
+    likeCount: number;
+    commentCount: number;
+    createdAt: string;
+    author?: {
+      _id: string;
+      name?: string;
+      pseudo?: string;
+      email?: string;
+    };
+    run?: {
+      _id: string;
+      distanceMetres: number;
+      durationSeconds: number;
+      startedAt: string;
+    };
+  }>;
+  reports: Array<{
+    _id: string;
+    reason: string;
+    status: "pending" | "resolved" | "dismissed";
+    createdAt: string;
+    reporter?: {
+      _id: string;
+      name?: string;
+      email?: string;
+    };
+    post?: {
+      _id: string;
+      caption?: string;
+    };
+  }>;
+};
+
 type ApiResult<T> =
   | { ok: true; data: T }
   | { ok: false; status: number; error: string };

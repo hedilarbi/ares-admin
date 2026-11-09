@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Award, Bell, Flag, LayoutDashboard, LogOut, Users } from "lucide-react";
+import { Award, Bell, Flag, LayoutDashboard, LogOut, Shield, Users } from "lucide-react";
 import type { AdminUser } from "@/lib/admin-session";
 
 const navItems = [
   { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/dashboard/users", label: "Utilisateurs", icon: Users },
+  { href: "/dashboard/groups", label: "Groupes & Clubs", icon: Shield },
   { href: "/dashboard/badges", label: "Badges", icon: Award },
   { href: "/dashboard/defis", label: "Défis", icon: Flag },
 ];
@@ -19,6 +20,10 @@ function pageTitle(pathname: string) {
 
   if (pathname.startsWith("/dashboard/users")) {
     return "Utilisateurs";
+  }
+
+  if (pathname.startsWith("/dashboard/groups")) {
+    return "Groupes & Clubs";
   }
 
   if (pathname.startsWith("/dashboard/badges")) {
