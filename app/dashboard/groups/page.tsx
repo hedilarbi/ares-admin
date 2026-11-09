@@ -103,7 +103,8 @@ export default async function AdminGroupsPage() {
                 <div className="mt-1 flex flex-wrap items-center gap-4 text-xs text-[var(--ares-muted)]">
                   <span className="inline-flex items-center gap-1">
                     <MapPin aria-hidden className="h-3.5 w-3.5" />
-                    {group.city}, {group.governorate}
+                    {[group.city, group.governorate].filter(Boolean).join(", ") ||
+                      `National (${group.country || "Tunisie"})`}
                   </span>
                   <span className="inline-flex items-center gap-1">
                     <Users aria-hidden className="h-3.5 w-3.5" />
